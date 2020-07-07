@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:Carros/pages/api_response.dart';
+import 'package:Carros/pages/carro/carro.dart';
 import 'package:Carros/pages/carro/home_page.dart';
 import 'package:Carros/pages/login/login_api.dart';
+import 'package:Carros/pages/login/login_bloc.dart';
 import 'package:Carros/pages/login/user.dart';
 import 'package:Carros/utils/alert.dart';
 import 'package:Carros/utils/nav.dart';
@@ -16,15 +20,17 @@ class LoginPage extends StatefulWidget{
 class _LoginPageState extends State<LoginPage> {
   final _tLogin = TextEditingController();
 
+  final _bloc = LoginBLoc();
+
   final _tsenha = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   final _focusSenha = FocusNode();
 
-  bool _showProgess = false;
   
-  /*@override
+  
+  @override
   void initState(){
     super.initState();
 
@@ -38,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
      }
     });
 
-  }*/
+  }
 
   @override 
   Widget build(BuildContext context){
@@ -82,7 +88,12 @@ class _LoginPageState extends State<LoginPage> {
              SizedBox(
                height:50,
               ),
-            AppButton("Login", onPressed: _onClickLogin, showProgress: _showProgess, )
+            StreamBuilder<bool>(
+              stream: _bloc.stream,
+              builder: (context, snapshot) {
+                return AppButton("Login", onPressed: _onClickLogin, showProgress: snapshot.data  ?? false);
+              }
+            )
            ],
           ),
       ),
@@ -97,12 +108,10 @@ class _LoginPageState extends State<LoginPage> {
     String senha = _tsenha.text;
     print("Login: $login, Senha: $senha");
 
-    setState(() {
-      _showProgess = true;
-    });
+   
 
     
-    ApiResponse response = await LoginApi.Login(login, senha);
+    ApiResponse response = await _bloc.Login(login, senha);
     
     if(response.ok){
       Usuario usuario = response.result;
@@ -114,9 +123,6 @@ class _LoginPageState extends State<LoginPage> {
       alert(context, response.msg);
     }
 
-    setState(() {
-      _showProgess = false;
-    });
   }
 
 
@@ -127,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
         }
         return null;
       }
-}
+
   String _validatePwd(String text) {
      if(text.isEmpty){
           return "Digite sua senha";
@@ -136,5 +142,12 @@ class _LoginPageState extends State<LoginPage> {
        return "A senha precisa ter no mínimo 3 caracteres";
      }
         return null;
+
       }
+
+@override 
+void dispose(){
+    _bloc.dispose();
+  }
+}
 
