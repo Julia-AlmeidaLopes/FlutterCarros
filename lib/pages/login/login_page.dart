@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     future.then((Usuario user) {
      if(user != null){
        setState(() {
-        _tLogin.text = user.login;
+        //_tLogin.text = user.login;
      });
      //login automático = push(context, Homepage(), replace: true);
      }

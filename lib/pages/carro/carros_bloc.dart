@@ -11,8 +11,8 @@ class CarrosBloc{
     try {
       List<Carro> carros = await CarrosApi.getCarros(tipo);
       _streamController.add(carros);
-    }catch (e) {
-      _streamController.addError(e);
+    }catch (a) {
+      _streamController.addError(a);
     }
     
     
